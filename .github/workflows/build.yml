@@ -27,16 +27,52 @@ jobs:
               - "adafruit/Adafruit-GFX-Library@1.12.0"
               - "adafruit/Adafruit_ILI9341@1.6.0"
               - "adafruit/Adafruit_InternalFlash@0.1.1"
+              - "adafruit/Adafruit_IS31FL3731@2.0.2"
+              - "adafruit/Adafruit_MAX1704X@1.0.3"
+              - "adafruit/Adafruit_NeoPixel@1.12.4"
+              - "adafruit/Adafruit_SH110x@2.1.10"
+              - "adafruit/Adafruit_SPIFlash@5.0.1"
+              - "adafruit/Adafruit_STMPE610@1.1.6"
+              - "adafruit/Adafruit_TinyUSB_Arduino@3.4.2"
+              - "adafruit/Adafruit_TouchScreen@1.1.5"
+              - "adafruit/Adafruit_TSC2007@1.1.2"
+              - "nopnop2002/Arduino-LoRa-Ra01S@1.0.0"
+              - "bblanchon/ArduinoJson@6.21.4"
+              - "me-no-dev/AsyncTCP@1.1.4"
+              - "bitbank2/bb_captouch@1.2.2"
+              - "bitbank2/bb_spi_lcd@2.9.1"
+              - "me-no-dev/ESPAsyncWebServer@2.10.4"
+              - "earlephilhower/ESP32-audioI2S@2.0.0"
+              - "felmue/ESP32Time@2.0.4"
+              - "dvarrel/ESPAsyncWebSrv@1.2.9"
+              - "PaulStoffregen/SoftwareSerial@8.1.0"
+              - "Arduino-FOC/FlashStorage@1.0.0"
+              - "moononournation/Arduino_GFX@1.2.9"
+              - "PaulStoffregen/ILI9341_t3@1.0"
+              - "Bodmer/JPEGDecoder@2.0.0"
+              - "ivanseidel/LinkedList@1.3.3"
+              - "lorol/LITTLEFS@1.0.6"
+              - "earlephilhower/arduino-pico@1.1.0"
+              - "lovyan03/LovyanGFX@1.1.9"
+              - "lvgl/lv_arduino@3.0.1"
+              - "stevemarple/MicroNMEA@2.0.6"
+              - "FortySevenEffects/arduino_midi_library@5.0.2"
+              - "h2zero/NimBLE-Arduino@1.3.5"
+              - "arduino-libraries/NTPClient@3.2.1"
+              - "adafruit/Adafruit_PicoDVI@1.3.0"
+              - "adafruit/SdFat@2.2.3"
+              - "lewisxhe/SensorLib@0.2.2"
+              - "justcallmekoko/SwitchLib@1.1.1"
+              - "tamctec/gt911-arduino@1.0.2"
+              - "ThingPulse/XPT2046_Touchscreen@1.4"
+              - "olikraus/U8g2@2.35.30"
+              - "libraries/Touch_GT911@latest"
+              - "libraries/TFT_eSPI-CYD/2.2C/TFT_eSPIt"
           - name: "Cheap Yellow Display 2.4"
             flag: "CYD_24"
             fbqn: "esp32:esp32:lolin32"
             build_dir: "lolin32"
-            libs:
-              - "adafruit/Adafruit_BusIO@1.17.0"
-              - "adafruit/Adafruit_CPFS@1.1.0"
-              - "adafruit/Adafruit-GFX-Library@1.12.0"
-              - "adafruit/Adafruit_ILI9341@1.6.0"
-              - "adafruit/Adafruit_InternalFlash@0.1.1"
+            libs: [] # Same as above or customized per board
 
     steps:
       - name: Checkout repository
@@ -68,7 +104,7 @@ jobs:
           sed -i 's/^[[:space:]]*#define CYD_\([^ ]*\)/\/\/\0/' esp32_marauder/configs.h
           sed -i "s/^\([[:space:]]*\)\/\/\s*#define ${{ matrix.board.flag }}/\1#define ${{ matrix.board.flag }}/" esp32_marauder/configs.h
 
-      - name: Install required libraries from GitHub
+      - name: Install required libraries from GitHub and Local
         run: |
           mkdir -p $HOME/Arduino/libraries
           cd $HOME/Arduino/libraries
@@ -77,7 +113,11 @@ jobs:
             VERSION=$(echo "$LIB" | cut -d@ -f2)
             NAME=$(basename "$REPO")
             echo "Cloning $REPO at $VERSION into $NAME"
-            git clone --depth 1 --branch "$VERSION" "https://github.com/$REPO.git" "$NAME"
+            if [[ "$REPO" == libraries/* ]]; then
+              cp -r "$ESP32_MARAUDER_WORKDIR/libraries/$NAME" "$NAME"
+            else
+              git clone --depth 1 --branch "$VERSION" "https://github.com/$REPO.git" "$NAME"
+            fi
           done
 
       - name: List installed Arduino libraries
