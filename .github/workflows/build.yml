@@ -29,12 +29,15 @@ jobs:
           mkdir -p $HOME/Arduino/libraries
           cp -r libraries/* $HOME/Arduino/libraries/
 
+      - name: List installed Arduino libraries
+        run: |
+          arduino-cli lib list
+
       - name: Compile with ArminJo/arduino-test-compile
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
-          sketch-names: esp32_marauder.ino
-          sketch-names-find-start: esp32_marauder
-          arduino-board-fqbn: esp32:esp32:lolin_d32
+          sketch-names: esp32_marauder/esp32_marauder.ino
+          arduino-board-fqbn: esp32:esp32:lolin32
           extra-arduino-cli-args: "--warnings none"
           arduino-platform: esp32:esp32@2.0.10
           platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
@@ -76,8 +79,7 @@ jobs:
       - name: Compile with ArminJo/arduino-test-compile
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
-          sketch-names: esp32_marauder.ino
-          sketch-names-find-start: esp32_marauder
+          sketch-names: esp32_marauder/esp32_marauder.ino
           arduino-board-fqbn: esp32:esp32:lolin_d32
           extra-arduino-cli-args: "--warnings none"
           arduino-platform: esp32:esp32@2.0.10
@@ -97,3 +99,4 @@ jobs:
         with:
           name: ${{ env.OUTFILE }}
           path: ${{ env.OUTFILE }}
+          
