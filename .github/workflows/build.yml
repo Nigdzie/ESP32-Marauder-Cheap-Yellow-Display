@@ -33,7 +33,7 @@ jobs:
         run: |
           curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
           echo "$PWD/bin" >> $GITHUB_PATH
-          export PATH="$PWD/bin:$PATH"
+          echo "PATH=$PWD/bin:$PATH" >> $GITHUB_ENV
           ./bin/arduino-cli version
 
       - name: Install ESP32 Core
@@ -67,7 +67,7 @@ jobs:
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
           sketch-names: esp32_marauder/esp32_marauder.ino
-          sketch-names-find-start: esp32-marauder-src
+          sketch-names-find-start: esp32-marauder-src/esp32_marauder
           arduino-board-fqbn: ${{ matrix.board.fbqn }}
           extra-arduino-cli-args: "--warnings none"
           arduino-platform: esp32:esp32@2.0.10
