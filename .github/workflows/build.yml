@@ -63,7 +63,7 @@ jobs:
           echo "Looking for .ino files in $ESP32_MARAUDER_WORKDIR..."
           find "$ESP32_MARAUDER_WORKDIR" -type f -name "*.ino"
 
-      - name: Compile for ${{ matrix.board.name }}
+      - name: Compile ${{ matrix.board.name }}
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
           sketch-names: esp32_marauder.ino
