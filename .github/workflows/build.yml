@@ -1,0 +1,97 @@
+name: Build ESP32 Marauder - Cheap Yellow Display
+
+on:
+  push:
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+  workflow_dispatch:
+
+jobs:
+  build_cyd_22cap:
+    name: Build CYD_22CAP
+    runs-on: ubuntu-latest
+    env:
+      CYD_VARIANT: CYD_22CAP
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select CYD variant in configs.h
+        run: |
+          sed -i 's/^\(\s*#define CYD_\)/\/\/\1/' esp32_marauder/configs.h
+          sed -i "s/^\(\s*\)\/\/\s*#define ${CYD_VARIANT}$/\1#define ${CYD_VARIANT}/" esp32_marauder/configs.h
+
+      - name: Install libraries from libraries folder
+        run: |
+          mkdir -p $HOME/Arduino/libraries
+          cp -r libraries/* $HOME/Arduino/libraries/
+
+      - name: Compile with ArminJo/arduino-test-compile
+        uses: ArminJo/arduino-test-compile@v3.2.1
+        with:
+          sketch-names: esp32_marauder/esp32_marauder.ino
+          arduino-board-fqbn: esp32:esp32:lolin_d32
+          extra-arduino-cli-args: "--warnings none"
+          arduino-platform: esp32:esp32@2.0.10
+          platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+
+      - name: Rename binary with version and date
+        run: |
+          VERSION=$(grep 'MARAUDER_VERSION' esp32_marauder/esp32_marauder.ino | cut -d '"' -f2 | tr '.' '_')
+          DATE=$(date +%Y%m%d)
+          BINFILE=$(find ~/.arduino15/packages/esp32/hardware/esp32/*/build -name '*.bin' | head -n1 || find esp32_marauder/build -name '*.bin' | head -n1)
+          OUTFILE="esp32_marauder_${VERSION}_${DATE}_${CYD_VARIANT,,}.bin"
+          cp "$BINFILE" "$OUTFILE"
+          echo "OUTFILE=$OUTFILE" >> $GITHUB_ENV
+
+      - name: Upload renamed artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.OUTFILE }}
+          path: ${{ env.OUTFILE }}
+
+  build_cyd_24:
+    name: Build CYD_24
+    runs-on: ubuntu-latest
+    env:
+      CYD_VARIANT: CYD_24
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select CYD variant in configs.h
+        run: |
+          sed -i 's/^\(\s*#define CYD_\)/\/\/\1/' esp32_marauder/configs.h
+          sed -i "s/^\(\s*\)\/\/\s*#define ${CYD_VARIANT}$/\1#define ${CYD_VARIANT}/" esp32_marauder/configs.h
+
+      - name: Install libraries from libraries folder
+        run: |
+          mkdir -p $HOME/Arduino/libraries
+          cp -r libraries/* $HOME/Arduino/libraries/
+
+      - name: Compile with ArminJo/arduino-test-compile
+        uses: ArminJo/arduino-test-compile@v3.2.1
+        with:
+          sketch-names: esp32_marauder/esp32_marauder.ino
+          arduino-board-fqbn: esp32:esp32:lolin_d32
+          extra-arduino-cli-args: "--warnings none"
+          arduino-platform: esp32:esp32@2.0.10
+          platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+
+      - name: Rename binary with version and date
+        run: |
+          VERSION=$(grep 'MARAUDER_VERSION' esp32_marauder/esp32_marauder.ino | cut -d '"' -f2 | tr '.' '_')
+          DATE=$(date +%Y%m%d)
+          BINFILE=$(find ~/.arduino15/packages/esp32/hardware/esp32/*/build -name '*.bin' | head -n1 || find esp32_marauder/build -name '*.bin' | head -n1)
+          OUTFILE="esp32_marauder_${VERSION}_${DATE}_${CYD_VARIANT,,}.bin"
+          cp "$BINFILE" "$OUTFILE"
+          echo "OUTFILE=$OUTFILE" >> $GITHUB_ENV
+
+      - name: Upload renamed artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.OUTFILE }}
+          path: ${{ env.OUTFILE }}
