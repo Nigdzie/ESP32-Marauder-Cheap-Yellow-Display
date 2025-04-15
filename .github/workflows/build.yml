@@ -32,7 +32,8 @@ jobs:
       - name: Compile with ArminJo/arduino-test-compile
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
-          sketch-names: esp32_marauder/esp32_marauder.ino
+          sketch-names: esp32_marauder.ino
+          sketch-names-find-start: esp32_marauder
           arduino-board-fqbn: esp32:esp32:lolin_d32
           extra-arduino-cli-args: "--warnings none"
           arduino-platform: esp32:esp32@2.0.10
@@ -75,7 +76,8 @@ jobs:
       - name: Compile with ArminJo/arduino-test-compile
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
-          sketch-names: esp32_marauder/esp32_marauder.ino
+          sketch-names: esp32_marauder.ino
+          sketch-names-find-start: esp32_marauder
           arduino-board-fqbn: esp32:esp32:lolin_d32
           extra-arduino-cli-args: "--warnings none"
           arduino-platform: esp32:esp32@2.0.10
