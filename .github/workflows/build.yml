@@ -50,46 +50,41 @@ jobs:
           sed -i 's/^[[:space:]]*#define CYD_\([^ ]*\)/\/\/\0/' esp32_marauder/configs.h
           sed -i "s/^\([[:space:]]*\)\/\/\s*#define ${{ matrix.board.flag }}/\1#define ${{ matrix.board.flag }}/" esp32_marauder/configs.h
 
-      # - name: Install libraries from libraries folder
-      #   run: |
-      #     mkdir -p $HOME/Arduino/libraries
-      #     cp -r "$ESP32_MARAUDER_WORKDIR"/libraries/* $HOME/Arduino/libraries/
-
       - name: Install Adafruit_BusIO
         uses: actions/checkout@v2
         with:
           repository: adafruit/Adafruit_BusIO
           ref: 1.15.0
-          path: CustomAdafruit_BusIO      
-          
+          path: CustomAdafruit_BusIO
+
       - name: Install Adafruit_CPFS
-          uses: actions/checkout@v2
-          with:
-            repository: adafruit/Adafruit_CPFS
-            ref: 1.1.0
-            path: CustomAdafruit_CPFS	
-        
+        uses: actions/checkout@v2
+        with:
+          repository: adafruit/Adafruit_CPFS
+          ref: 1.1.0
+          path: CustomAdafruit_CPFS
+
       - name: Install Adafruit-GFX-Library
-          uses: actions/checkout@v2
-          with:
-            repository: adafruit/Adafruit-GFX-Library
-            ref: 1.12.0
-            path: CustomAdafruit-GFX-Library
-		  
+        uses: actions/checkout@v2
+        with:
+          repository: adafruit/Adafruit-GFX-Library
+          ref: 1.12.0
+          path: CustomAdafruit-GFX-Library
+
       - name: Install Adafruit_ILI9341
-          uses: actions/checkout@v2
-          with:
-            repository: adafruit/Adafruit_ILI9341
-            ref: 1.6.0
-            path: CustomAdafruit_ILI9341		
-		  
+        uses: actions/checkout@v2
+        with:
+          repository: adafruit/Adafruit_ILI9341
+          ref: 1.6.0
+          path: CustomAdafruit_ILI9341
+
       - name: Install Adafruit_InternalFlash
-          uses: actions/checkout@v2
-          with:
-            repository: adafruit/Adafruit_InternalFlash
-            ref: 1.6.0
-            path: CustomAdafruit_InternalFlash 
-      
+        uses: actions/checkout@v2
+        with:
+          repository: adafruit/Adafruit_InternalFlash
+          ref: 1.6.0
+          path: CustomAdafruit_InternalFlash
+
       - name: List installed Arduino libraries
         run: ./bin/arduino-cli lib list
 
