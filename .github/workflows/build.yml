@@ -32,17 +32,17 @@ jobs:
       - name: Install Arduino CLI
         run: |
           curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
-          echo "$(pwd)/bin" >> $GITHUB_PATH
-          export PATH="$(pwd)/bin:$PATH"
-          arduino-cli version
+          echo "$PWD/bin" >> $GITHUB_PATH
+          export PATH="$PWD/bin:$PATH"
+          ./bin/arduino-cli version
 
       - name: Install ESP32 Core
         run: |
-          arduino-cli core update-index
-          arduino-cli core install esp32:esp32@2.0.10
+          ./bin/arduino-cli core update-index
+          ./bin/arduino-cli core install esp32:esp32@2.0.10
 
       - name: Verify Installed Cores
-        run: arduino-cli core list
+        run: ./bin/arduino-cli core list
 
       - name: Select CYD variant in configs.h
         run: |
@@ -56,7 +56,7 @@ jobs:
           cp -r "$ESP32_MARAUDER_WORKDIR"/libraries/* $HOME/Arduino/libraries/
 
       - name: List installed Arduino libraries
-        run: arduino-cli lib list
+        run: ./bin/arduino-cli lib list
 
       - name: List all sketches before build
         run: |
@@ -66,8 +66,8 @@ jobs:
       - name: Compile ${{ matrix.board.name }}
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
-          sketch-names: esp32_marauder.ino
-          sketch-names-find-start: "$ESP32_MARAUDER_WORKDIR"/esp32-marauder-src
+          sketch-names: esp32_marauder/esp32_marauder.ino
+          sketch-names-find-start: esp32-marauder-src
           arduino-board-fqbn: ${{ matrix.board.fbqn }}
           extra-arduino-cli-args: "--warnings none"
           arduino-platform: esp32:esp32@2.0.10
