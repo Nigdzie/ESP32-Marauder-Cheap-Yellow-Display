@@ -84,11 +84,11 @@ jobs:
           repository: adafruit/Adafruit_InternalFlash
           ref: 0.1.1
           path: CustomAdafruit_InternalFlash
-      
+
       - name: Move all custom libs to Arduino libraries
-          run: |
-            mkdir -p $HOME/Arduino/libraries
-            mv *Custom* $HOME/Arduino/libraries/
+        run: |
+          mkdir -p $HOME/Arduino/libraries
+          mv *Custom* $HOME/Arduino/libraries/
 
       - name: List installed Arduino libraries
         run: ./bin/arduino-cli lib list
