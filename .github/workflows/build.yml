@@ -55,35 +55,40 @@ jobs:
         with:
           repository: adafruit/Adafruit_BusIO
           ref: 1.15.0
-          path: ${{ github.workspace }}/Arduino/libraries/CustomAdafruit_BusIO
+          path: CustomAdafruit_BusIO
 
       - name: Install Adafruit_CPFS
         uses: actions/checkout@v2
         with:
           repository: adafruit/Adafruit_CPFS
           ref: 1.1.0
-          path: ${{ github.workspace }}/Arduino/libraries/CustomAdafruit_CPFS
+          path: CustomAdafruit_CPFS
 
       - name: Install Adafruit-GFX-Library
         uses: actions/checkout@v2
         with:
           repository: adafruit/Adafruit-GFX-Library
           ref: 1.12.0
-          path: ${{ github.workspace }}/Arduino/libraries/CustomAdafruit-GFX-Library
+          path: CustomAdafruit-GFX-Library
 
       - name: Install Adafruit_ILI9341
         uses: actions/checkout@v2
         with:
           repository: adafruit/Adafruit_ILI9341
           ref: 1.6.0
-          path: ${{ github.workspace }}/Arduino/libraries/CustomAdafruit_ILI9341
+          path: CustomAdafruit_ILI9341
 
       - name: Install Adafruit_InternalFlash
         uses: actions/checkout@v2
         with:
           repository: adafruit/Adafruit_InternalFlash
           ref: 0.1.1
-          path: ${{ github.workspace }}/Arduino/libraries/CustomAdafruit_InternalFlash
+          path: CustomAdafruit_InternalFlash
+      
+      - name: Move all custom libs to Arduino libraries
+          run: |
+            mkdir -p $HOME/Arduino/libraries
+            mv *Custom* $HOME/Arduino/libraries/
 
       - name: List installed Arduino libraries
         run: ./bin/arduino-cli lib list
