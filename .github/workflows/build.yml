@@ -17,8 +17,26 @@ jobs:
       fail-fast: false
       matrix:
         board:
-          - { name: "Cheap Yellow Display 2.2", flag: "CYD_22CAP", fbqn: "esp32:esp32:lolin32", build_dir: "lolin32" }
-          - { name: "Cheap Yellow Display 2.4", flag: "CYD_24", fbqn: "esp32:esp32:lolin32", build_dir: "lolin32" }
+          - name: "Cheap Yellow Display 2.2"
+            flag: "CYD_22CAP"
+            fbqn: "esp32:esp32:lolin32"
+            build_dir: "lolin32"
+            libs:
+              - "adafruit/Adafruit_BusIO@1.17.0"
+              - "adafruit/Adafruit_CPFS@1.1.0"
+              - "adafruit/Adafruit-GFX-Library@1.12.0"
+              - "adafruit/Adafruit_ILI9341@1.6.0"
+              - "adafruit/Adafruit_InternalFlash@0.1.1"
+          - name: "Cheap Yellow Display 2.4"
+            flag: "CYD_24"
+            fbqn: "esp32:esp32:lolin32"
+            build_dir: "lolin32"
+            libs:
+              - "adafruit/Adafruit_BusIO@1.17.0"
+              - "adafruit/Adafruit_CPFS@1.1.0"
+              - "adafruit/Adafruit-GFX-Library@1.12.0"
+              - "adafruit/Adafruit_ILI9341@1.6.0"
+              - "adafruit/Adafruit_InternalFlash@0.1.1"
 
     steps:
       - name: Checkout repository
@@ -50,45 +68,17 @@ jobs:
           sed -i 's/^[[:space:]]*#define CYD_\([^ ]*\)/\/\/\0/' esp32_marauder/configs.h
           sed -i "s/^\([[:space:]]*\)\/\/\s*#define ${{ matrix.board.flag }}/\1#define ${{ matrix.board.flag }}/" esp32_marauder/configs.h
 
-      - name: Install Adafruit_BusIO
-        uses: actions/checkout@v2
-        with:
-          repository: adafruit/Adafruit_BusIO
-          ref: 1.15.0
-          path: CustomAdafruit_BusIO
-
-      - name: Install Adafruit_CPFS
-        uses: actions/checkout@v2
-        with:
-          repository: adafruit/Adafruit_CPFS
-          ref: 1.1.0
-          path: CustomAdafruit_CPFS
-
-      - name: Install Adafruit-GFX-Library
-        uses: actions/checkout@v2
-        with:
-          repository: adafruit/Adafruit-GFX-Library
-          ref: 1.12.0
-          path: CustomAdafruit-GFX-Library
-
-      - name: Install Adafruit_ILI9341
-        uses: actions/checkout@v2
-        with:
-          repository: adafruit/Adafruit_ILI9341
-          ref: 1.6.0
-          path: CustomAdafruit_ILI9341
-
-      - name: Install Adafruit_InternalFlash
-        uses: actions/checkout@v2
-        with:
-          repository: adafruit/Adafruit_InternalFlash
-          ref: 0.1.1
-          path: CustomAdafruit_InternalFlash
-
-      - name: Move all custom libs to Arduino libraries
+      - name: Install required libraries from GitHub
         run: |
           mkdir -p $HOME/Arduino/libraries
-          mv *Custom* $HOME/Arduino/libraries/
+          cd $HOME/Arduino/libraries
+          for LIB in ${{ join(matrix.board.libs, ' ') }}; do
+            REPO=$(echo "$LIB" | cut -d@ -f1)
+            VERSION=$(echo "$LIB" | cut -d@ -f2)
+            NAME=$(basename "$REPO")
+            echo "Cloning $REPO at $VERSION into $NAME"
+            git clone --depth 1 --branch "$VERSION" "https://github.com/$REPO.git" "$NAME"
+          done
 
       - name: List installed Arduino libraries
         run: ./bin/arduino-cli lib list
