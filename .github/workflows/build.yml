@@ -23,12 +23,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          path: esp32-marauder-src
+
+      - name: Set working directory
+        run: echo "ESP32_MARAUDER_WORKDIR=$(pwd)/esp32-marauder-src" >> $GITHUB_ENV
 
       - name: Install Arduino CLI
         run: |
           curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
-          echo "$PWD/bin" >> $GITHUB_PATH
-          export PATH="$PWD/bin:$PATH"
+          echo "$GITHUB_ENV/bin" >> $GITHUB_PATH
+          export PATH="$GITHUB_ENV/bin:$PATH"
           arduino-cli version
 
       - name: Install ESP32 Core
@@ -41,23 +46,23 @@ jobs:
 
       - name: Select CYD variant in configs.h
         run: |
-          sed -i 's/^\(\s*#define CYD_\)/\/\/\1/' esp32_marauder/configs.h
-          sed -i "s/^\(\s*\)\/\/\s*#define ${{ matrix.board.flag }}/\1#define ${{ matrix.board.flag }}/" esp32_marauder/configs.h
+          cd "$ESP32_MARAUDER_WORKDIR"
+          sed -i 's/^[[:space:]]*#define CYD_\([^ ]*\)/\/\/\0/' esp32_marauder/configs.h
+          sed -i "s/^\([[:space:]]*\)\/\/[[:space:]]*#define ${{ matrix.board.flag }}/\1#define ${{ matrix.board.flag }}/" esp32_marauder/configs.h
 
       - name: Install libraries from libraries folder
         run: |
           mkdir -p $HOME/Arduino/libraries
-          cp -r libraries/* $HOME/Arduino/libraries/
+          cp -r "$ESP32_MARAUDER_WORKDIR"/libraries/* $HOME/Arduino/libraries/
 
       - name: List installed Arduino libraries
-        run: |
-          export PATH="$PWD/bin:$PATH"
-          arduino-cli lib list
+        run: arduino-cli lib list
 
       - name: Compile with ArminJo/arduino-test-compile
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
           sketch-names: esp32_marauder/esp32_marauder.ino
+          sketch-names-find-start: esp32-marauder-src
           arduino-board-fqbn: ${{ matrix.board.fbqn }}
           extra-arduino-cli-args: "--warnings none"
           arduino-platform: esp32:esp32@2.0.10
@@ -65,6 +70,7 @@ jobs:
 
       - name: Rename binary with version and date
         run: |
+          cd "$ESP32_MARAUDER_WORKDIR"
           VERSION=$(grep 'MARAUDER_VERSION' esp32_marauder/esp32_marauder.ino | cut -d '"' -f2 | tr '.' '_')
           DATE=$(date +%Y%m%d)
           BINFILE=$(find ~/.arduino15/packages/esp32/hardware/esp32/*/build -name '*.bin' | head -n1 || find esp32_marauder/build -name '*.bin' | head -n1)
