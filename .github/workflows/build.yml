@@ -19,7 +19,7 @@ jobs:
         board:
           - name: "Cheap Yellow Display 2.2"
             flag: "CYD_22CAP"
-            fbqn: "esp32:esp32:lolin32"
+            fbqn: "esp32:esp32:d32:PartitionScheme=min_spiffs"
             build_dir: "lolin32"
             libs:
               - "adafruit/Adafruit_BusIO@1.17.0"
@@ -99,8 +99,12 @@ jobs:
       - name: Select CYD variant in configs.h
         run: |
           cd "$ESP32_MARAUDER_WORKDIR"
-          sed -i 's/^[[:space:]]*#define CYD_\([^ ]*\)/\/\/\0/' esp32_marauder/configs.h
-          sed -i "s/^\([[:space:]]*\)\/\/\s*#define ${{ matrix.board.flag }}/\1#define ${{ matrix.board.flag }}/" esp32_marauder/configs.h
+          echo "Before modification:"
+          grep -E '^\s*(//)?\s*#define CYD_' esp32_marauder/configs.h || echo "No CYD_ lines found"
+          sed -i 's/^\([[:space:]]*\)#define CYD_/\1\/\/#define CYD_/' esp32_marauder/configs.h
+          sed -i "s/^\([[:space:]]*\)\/\/#define ${{ matrix.board.flag }}/\1#define ${{ matrix.board.flag }}/" esp32_marauder/configs.h
+          echo "After modification:"
+          grep -E '^\s*(//)?\s*#define CYD_' esp32_marauder/configs.h || echo "No CYD_ lines found"
 
       - name: Install required libraries from GitHub
         run: |
