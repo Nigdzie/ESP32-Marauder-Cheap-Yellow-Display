@@ -38,7 +38,6 @@ jobs:
               - "adafruit/Adafruit_TSC2007@1.1.2"
               - "bitbank2/bb_spi_lcd@2.9.1"
               - "dvarrel/ESPAsyncWebSrv@1.2.9"
-              - "PaulStoffregen/SoftwareSerial@8.1.0"
               - "PaulStoffregen/ILI9341_t3@1.0"
               - "Bodmer/JPEGDecoder@2.0.0"
               - "lovyan03/LovyanGFX@1.1.9"
