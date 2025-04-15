@@ -66,8 +66,8 @@ jobs:
       - name: Compile ${{ matrix.board.name }}
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
-          sketch-names: esp32_marauder/esp32_marauder.ino
-          sketch-names-find-start: esp32-marauder-src/esp32_marauder
+          sketch-names: esp32_marauder.ino
+          sketch-names-find-start: esp32-marauder-src
           arduino-board-fqbn: ${{ matrix.board.fbqn }}
           extra-arduino-cli-args: "--warnings none"
           arduino-platform: esp32:esp32@2.0.10
