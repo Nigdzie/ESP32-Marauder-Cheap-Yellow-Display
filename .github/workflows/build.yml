@@ -13,16 +13,36 @@ jobs:
   build_cyd_22cap:
     name: Build CYD_22CAP
     runs-on: ubuntu-latest
-    env:
-      CYD_VARIANT: CYD_22CAP
+    strategy:
+      fail-fast: false
+      matrix:
+        board:
+          - { name: "Cheap Yellow Display 2.2" , flag: "CYD_22CAP", fbqn: "esp32:esp32:lolin32", build_dir: "lolin32" }
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Install Arduino CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          arduino-cli version
+
+      - name: Install ESP32 Core
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32@2.0.10
+
+      - name: Verify Installed Cores
+        run: arduino-cli core list
 
       - name: Select CYD variant in configs.h
         run: |
           sed -i 's/^\(\s*#define CYD_\)/\/\/\1/' esp32_marauder/configs.h
           sed -i "s/^\(\s*\)\/\/\s*#define ${CYD_VARIANT}$/\1#define ${CYD_VARIANT}/" esp32_marauder/configs.h
+        env:
+          CYD_VARIANT: ${{ matrix.board.flag }}
 
       - name: Install libraries from libraries folder
         run: |
@@ -30,14 +50,13 @@ jobs:
           cp -r libraries/* $HOME/Arduino/libraries/
 
       - name: List installed Arduino libraries
-        run: |
-          ~/.arduino15/packages/esp32/tools/arduino-cli/*/arduino-cli lib list || echo "arduino-cli not found"
+        run: arduino-cli lib list
 
       - name: Compile with ArminJo/arduino-test-compile
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
           sketch-names: esp32_marauder/esp32_marauder.ino
-          arduino-board-fqbn: esp32:esp32:lolin32
+          arduino-board-fqbn: ${{ matrix.board.fbqn }}
           extra-arduino-cli-args: "--warnings none"
           arduino-platform: esp32:esp32@2.0.10
           platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
@@ -47,7 +66,7 @@ jobs:
           VERSION=$(grep 'MARAUDER_VERSION' esp32_marauder/esp32_marauder.ino | cut -d '"' -f2 | tr '.' '_')
           DATE=$(date +%Y%m%d)
           BINFILE=$(find ~/.arduino15/packages/esp32/hardware/esp32/*/build -name '*.bin' | head -n1 || find esp32_marauder/build -name '*.bin' | head -n1)
-          OUTFILE="esp32_marauder_${VERSION}_${DATE}_${CYD_VARIANT,,}.bin"
+          OUTFILE="esp32_marauder_${VERSION}_${DATE}_${{ matrix.board.flag }}.bin"
           cp "$BINFILE" "$OUTFILE"
           echo "OUTFILE=$OUTFILE" >> $GITHUB_ENV
 
@@ -60,27 +79,50 @@ jobs:
   build_cyd_24:
     name: Build CYD_24
     runs-on: ubuntu-latest
-    env:
-      CYD_VARIANT: CYD_24
+    strategy:
+      fail-fast: false
+      matrix:
+        board:
+          - { name: "Cheap Yellow Display 2.4", flag: "CYD_24", fbqn: "esp32:esp32:lolin32", build_dir: "lolin32" }
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Install Arduino CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          arduino-cli version
+
+      - name: Install ESP32 Core
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32@2.0.10
+
+      - name: Verify Installed Cores
+        run: arduino-cli core list
 
       - name: Select CYD variant in configs.h
         run: |
           sed -i 's/^\(\s*#define CYD_\)/\/\/\1/' esp32_marauder/configs.h
           sed -i "s/^\(\s*\)\/\/\s*#define ${CYD_VARIANT}$/\1#define ${CYD_VARIANT}/" esp32_marauder/configs.h
+        env:
+          CYD_VARIANT: ${{ matrix.board.flag }}
 
       - name: Install libraries from libraries folder
         run: |
           mkdir -p $HOME/Arduino/libraries
           cp -r libraries/* $HOME/Arduino/libraries/
 
+      - name: List installed Arduino libraries
+        run: arduino-cli lib list
+
       - name: Compile with ArminJo/arduino-test-compile
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
           sketch-names: esp32_marauder/esp32_marauder.ino
-          arduino-board-fqbn: esp32:esp32:lolin32
+          arduino-board-fqbn: ${{ matrix.board.fbqn }}
           extra-arduino-cli-args: "--warnings none"
           arduino-platform: esp32:esp32@2.0.10
           platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
@@ -90,7 +132,7 @@ jobs:
           VERSION=$(grep 'MARAUDER_VERSION' esp32_marauder/esp32_marauder.ino | cut -d '"' -f2 | tr '.' '_')
           DATE=$(date +%Y%m%d)
           BINFILE=$(find ~/.arduino15/packages/esp32/hardware/esp32/*/build -name '*.bin' | head -n1 || find esp32_marauder/build -name '*.bin' | head -n1)
-          OUTFILE="esp32_marauder_${VERSION}_${DATE}_${CYD_VARIANT,,}.bin"
+          OUTFILE="esp32_marauder_${VERSION}_${DATE}_${{ matrix.board.flag }}.bin"
           cp "$BINFILE" "$OUTFILE"
           echo "OUTFILE=$OUTFILE" >> $GITHUB_ENV
 
