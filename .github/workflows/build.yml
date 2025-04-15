@@ -18,7 +18,7 @@ jobs:
       matrix:
         board:
           - name: "Cheap Yellow Display 2.2"
-            flag: "CYD_22CAP"
+            flag: "CYD_24CAP"
             fbqn: "esp32:esp32:d32:PartitionScheme=min_spiffs"
             build_dir: "lolin32"
             libs:
@@ -54,7 +54,7 @@ jobs:
               - "libraries/ThingPulse_XPT2046_Touch@latest"
               - "libraries/Touch_GT911@latest"
               - "libraries/Arduino-Ra01S@latest"
-              - "libraries/TFT_eSPI-CYD/2.2C/TFT_eSPI@Adafruit_PicoDVIlatest"
+              - "libraries/TFT_eSPI-CYD/2.4C/TFT_eSPI@latest"
               - "libraries/ESPAsyncWebServer@latest"
               - "libraries/ESP32-audioI2S-master@latest"
               - "libraries/ESP32Time@latest"
@@ -66,10 +66,8 @@ jobs:
               - "libraries/MIDI_Library@latest"
               - "libraries/AsyncTCP@latest"
               - "libraries/PicoDVI_-_Adafruit_Fork@latest"
-              - "libraries/Adafruit_GFX_Library@latest"
               - "libraries/bb_captouch@latest"
               - "libraries/ArduinoJson@latest"
-              - "libraries/Arduino-Ra01S@latest"
               - "libraries/ESPAsyncTCP@latest"
 
     steps:
