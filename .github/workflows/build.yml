@@ -104,7 +104,7 @@ jobs:
           sed -i 's/^[[:space:]]*#define CYD_\([^ ]*\)/\/\/\0/' esp32_marauder/configs.h
           sed -i "s/^\([[:space:]]*\)\/\/\s*#define ${{ matrix.board.flag }}/\1#define ${{ matrix.board.flag }}/" esp32_marauder/configs.h
 
-      - name: Install required libraries from GitHub and Local
+      - name: Install required libraries from GitHub
         run: |
           mkdir -p $HOME/Arduino/libraries
           cd $HOME/Arduino/libraries
@@ -112,13 +112,20 @@ jobs:
             REPO=$(echo "$LIB" | cut -d@ -f1)
             VERSION=$(echo "$LIB" | cut -d@ -f2)
             NAME=$(basename "$REPO")
-            echo "Cloning $REPO at $VERSION into $NAME"
+            echo "Processing: $REPO@$VERSION"
             if [[ "$REPO" == libraries/* ]]; then
               cp -r "$ESP32_MARAUDER_WORKDIR/libraries/$NAME" "$NAME"
             else
-              git clone --depth 1 --branch "$VERSION" "https://github.com/$REPO.git" "$NAME"
+              echo "Checking if https://github.com/$REPO.git has $VERSION..."
+              if git ls-remote --tags --heads https://github.com/$REPO.git | grep -q "refs/tags/$VERSION"; then
+                echo "Cloning tag $VERSION from $REPO"
+                git clone --depth 1 --branch "$VERSION" "https://github.com/$REPO.git" "$NAME"
+              else
+                echo "::warning::Tag '$VERSION' not found for $REPO. Skipping."
+              fi
             fi
           done
+
 
       - name: List installed Arduino libraries
         run: ./bin/arduino-cli lib list
