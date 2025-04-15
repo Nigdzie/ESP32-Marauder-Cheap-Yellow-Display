@@ -31,7 +31,7 @@ jobs:
 
       - name: List installed Arduino libraries
         run: |
-          arduino-cli lib list
+          ~/.arduino15/packages/esp32/tools/arduino-cli/*/arduino-cli lib list || echo "arduino-cli not found"
 
       - name: Compile with ArminJo/arduino-test-compile
         uses: ArminJo/arduino-test-compile@v3.2.1
@@ -80,7 +80,7 @@ jobs:
         uses: ArminJo/arduino-test-compile@v3.2.1
         with:
           sketch-names: esp32_marauder/esp32_marauder.ino
-          arduino-board-fqbn: esp32:esp32:lolin_d32
+          arduino-board-fqbn: esp32:esp32:lolin32
           extra-arduino-cli-args: "--warnings none"
           arduino-platform: esp32:esp32@2.0.10
           platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
@@ -99,4 +99,3 @@ jobs:
         with:
           name: ${{ env.OUTFILE }}
           path: ${{ env.OUTFILE }}
-          
